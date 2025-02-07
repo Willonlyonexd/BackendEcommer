@@ -24,6 +24,8 @@ import { VentaModule } from './api/venta/venta.module';
 import { ProveedorModule } from './api/proveedor/proveedor.module';
 
 import { AlmacenModule } from './api/almacen/almacen.module';
+import { EstadisticaModule } from './api/estadistica/estadistica.module';
+import { ReporteModule } from './api/reporte/reporte.module';
 
 
 
@@ -31,9 +33,9 @@ import { AlmacenModule } from './api/almacen/almacen.module';
 
 
 @Module({
-  
+
   imports: [
- 
+
     MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
     MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
     UsuarioModule,
@@ -49,13 +51,14 @@ import { AlmacenModule } from './api/almacen/almacen.module';
     VisitanteModule,
     VentaModule,
     ProveedorModule,
-    AlmacenModule
-   
+    AlmacenModule,
+    EstadisticaModule,
+    ReporteModule
   ],
-  controllers: [AppController, ],
-  providers: [AppService, 
+  controllers: [AppController,],
+  providers: [AppService,
   ],
 })
 export class AppModule {
-  
+
 }

@@ -88,6 +88,9 @@ export class FuncionalidadController {
         await this.funcionalidadService.createFuncionalidad(
             { nombre: 'crear egreso', descripcion: 'permite crear una egreso', tipo: 1 })
 
+        await this.funcionalidadService.createFuncionalidad(
+            { nombre: 'detalles de ingreso', descripcion: 'permite detallar ingreso', tipo: 1 })
+
 
 
 

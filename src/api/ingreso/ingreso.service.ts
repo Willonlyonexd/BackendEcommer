@@ -110,8 +110,80 @@ export class IngresoService {
             return {data:ingresos};    
           } catch (error) {
             return {data:undefined, message:'no se pudo obtener los ingresos'}
+        }
     }
-}
+
+    async createEgreso  (data:any, usuario:any) {
+     try {
+
+        console.log(data)
+        const ingreso= await this.ingresoModel.find({tipo:"egreso"}).sort({createdAT:-1});
+        let codigo=0;
+        if(ingreso.length==0){
+            codigo=1
+        }else{
+            codigo=ingreso[0].codigo+1;
+        }
+
+        data.usuario=usuario.sub;
+        data.codigo=codigo;
+        data.tipo='Egreso'
+        data.estado='Procesado'
+        const regIngreso= await this.ingresoModel.create(data);
+        
+        
+        for(const item of data.detalles){
+
+            const ingresos=await this.ingresoDetalleModel.find(
+                {   producto:item.producto,
+                    producto_variedad:item.producto_variedad,
+                    almacen:data.almacen,
+                    estado:true,
+                    estado_:"Confirmado"
+                }).sort({createdAT:-1}).limit(item.cantidad)
+
+                console.log(ingresos.length)
+                for (const ingreso of ingresos) {
+                    await this.ingresoDetalleModel.findOneAndUpdate({_id:ingreso._id},{estado:false})
+                }
+
+        }
+
+        return {data:regIngreso}
+
+     } catch (error) {
+        console.log(error)  
+        return {data:undefined, message:'no se pudo crear los ingresos'}
+     }           
+    }
+
+    async BuscarProductoAlmacen(almacen,producto,variead,cantidad) {
+        
+        try {
+            const ingresosProducto = await this.ingresoDetalleModel.find({producto:producto,almacen:almacen,estado:true,estado_:"Confirmado"}).sort({createdAT:-1})
+
+            if(ingresosProducto.length==0){
+                return {data:undefined, message:'no se encuentra el producto en el almacen'}
+            }
+
+            const productoVariedad= await this.ingresoDetalleModel.find({producto:producto,producto_variedad:variead,almacen:almacen,estado:true,estado_:"Confirmado"}).sort({createdAT:-1})
+            if(productoVariedad.length==0){
+                return {data:undefined, message:'no se encuentra la variedad del producto en el almacen'}
+            }
+
+
+            if(productoVariedad.length<cantidad){
+                return {data:undefined, message:'no se encuentra la cantidad del producto en el almacen'}
+            }
+
+            return {cantidad:productoVariedad.length, message:'OK'}
+
+           
+              
+          } catch (error) {
+            return {data:undefined, message:'no se pudo obtener los ingresos'}
+        }
     
+    }
 
 }

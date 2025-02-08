@@ -132,7 +132,12 @@ export class UsuarioService {
 
 
                 })
-                return {data:usuario[0],jwt}
+                if(usuario[0].estado){
+                    return {data:usuario[0],jwt}
+                }{
+                    return{data:undefined, message:'el usuario esta desactivado'}
+                }
+                
             }else{
                 return{data:undefined, message:'la contraseña es incorrecta'}
             }

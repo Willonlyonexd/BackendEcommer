@@ -8,26 +8,33 @@ export class EstadisticaController {
 
   @Get('total-ventas')
   @UseGuards(AuthGuard)
-  async totalVentas(@Query('filtro') filtro?: string) {
-    return { total: await this.estadisticaService.totalVentas(filtro) };
+  async totalVentas(
+    @Query('filtro') filtro?: string,
+    @Query('agruparPorMes') agruparPorMes?: string
+  ) {
+    const agrupar = agruparPorMes === 'true';
+    return await this.estadisticaService.totalVentas(filtro, agrupar);
   }
+
 
   @Get('cantidad-ventas')
   @UseGuards(AuthGuard)
   async cantidadVentasRealizadas(@Query('filtro') filtro?: string) {
-    return { cantidad: await this.estadisticaService.cantidadVentasRealizadas(filtro) };
+    const { totalVentas, detallePorEstado } = await this.estadisticaService.cantidadVentasRealizadas(filtro);
+    return { totalVentas, detallePorEstado };
   }
 
   @Get('ingresos')
   @UseGuards(AuthGuard)
   async ingresosGenerados(@Query('filtro') filtro?: string) {
-    return { ingresos: await this.estadisticaService.ingresosGenerados(filtro) };
+    const detalle = await this.estadisticaService.ingresosGenerados(filtro);
+    return { ingresos: detalle.totalIngresos, detallePorProducto: detalle.detallePorProducto };
   }
 
   @Get('productos-mas-vendidos')
   @UseGuards(AuthGuard)
   async productosMasVendidos(@Query('limit') limit?: string) {
-    return await this.estadisticaService.productosMasVendidos(Number(limit));
+    const detalle = await this.estadisticaService.productosMasVendidos(Number(limit));
+    return detalle
   }
-
-}
+} 

@@ -1,74 +1,129 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 
 @Injectable()
 export class EstadisticaService {
   constructor(
-    @InjectModel('venta') private readonly ventaModel: Model<any>,
-    @InjectModel('ventaDetalle') private readonly ventaDetalleModel: Model<any>,
+    @InjectModel('venta') private readonly ventaModel,
+    @InjectModel('ventaDetalle') private readonly ventaDetalleModel,
+    @InjectModel('ingreso') private readonly ingresoModel,
   ) { }
 
-  /**
-   * Calcula el total de ventas en la plataforma.
-   */
-  async totalVentas(filtro?: string): Promise<number> {
+  async totalVentas(filtro?: string, agruparPorMes: boolean = false) {
     let matchStage = {};
     if (filtro) {
       matchStage = this.getFechaFiltro(filtro);
     }
+
+    const pipeline: any[] = [
+      { $match: matchStage }
+    ];
+
+    if (agruparPorMes) {
+      pipeline.push({
+        $group: {
+          _id: { mes: { $month: '$createdAT' }, anio: { $year: '$createdAT' } },
+          total: { $sum: '$total' }
+        }
+      },
+        {
+          $sort: { '_id.anio': 1, '_id.mes': 1 }
+        },
+        {
+          $project: {
+            _id: 0,
+            mes: '$_id.mes',
+            anio: '$_id.anio',
+            total: 1
+          }
+        });
+    } else {
+      pipeline.push({
+        $group: { _id: null, total: { $sum: '$total' } }
+      });
+    }
+
+    const resultado = await this.ventaModel.aggregate(pipeline);
+
+    if (agruparPorMes) {
+      return resultado;
+    } else {
+      return resultado.length > 0 ? resultado[0].total : 0;
+    }
+  }
+
+
+  async cantidadVentasRealizadas(filtro?: string): Promise<any> {
+    const matchStage = filtro ? this.getFechaFiltro(filtro) : {};
 
     const resultado = await this.ventaModel.aggregate([
       { $match: matchStage },
-      { $group: { _id: null, total: { $sum: '$total' } } },
+      {
+        $group: {
+          _id: { estado: "$estado", mes: { $month: "$createdAT" }, anio: { $year: "$createdAT" } },
+          cantidad: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.anio': 1, '_id.mes': 1 } }
     ]);
 
-    return resultado.length > 0 ? resultado[0].total : 0;
+    const totalVentas = resultado.reduce((acc, curr) => acc + curr.cantidad, 0);
+    const detallePorEstado = resultado.map(item => ({
+      estado: item._id.estado,
+      mes: this.getNombreMes(item._id.mes),
+      anio: item._id.anio,
+      cantidad: item.cantidad
+    }));
+
+    return { totalVentas, detallePorEstado };
   }
 
-  /**
-   * Retorna la cantidad total de ventas realizadas.
-   */
-  async cantidadVentasRealizadas(filtro?: string): Promise<number> {
-    let matchStage = {};
-    if (filtro) {
-      matchStage = this.getFechaFiltro(filtro);
-    }
 
-    return await this.ventaModel.countDocuments(matchStage);
-  }
+  async ingresosGenerados(filtro?: string): Promise<any> {
+    const matchStage = filtro ? this.getFechaFiltro(filtro) : {};
 
-  /**
-   * Obtiene los ingresos generados en un periodo de tiempo.
-   */
-  async ingresosGenerados(filtro?: string): Promise<number> {
-    let matchStage = {};
-    if (filtro) {
-      matchStage = this.getFechaFiltro(filtro);
-    }
-
-    const resultado = await this.ventaModel.aggregate([
+    const resultado = await this.ventaDetalleModel.aggregate([
       { $match: matchStage },
-      { $group: { _id: null, total: { $sum: '$total' } } },
+      {
+        $lookup: {
+          from: 'productos',
+          localField: 'producto',
+          foreignField: '_id',
+          as: 'productoInfo'
+        }
+      },
+      { $unwind: '$productoInfo' },
+      {
+        $group: {
+          _id: '$productoInfo.titulo',
+          ingresos: { $sum: { $multiply: ['$cantidad', '$precio'] } },
+          cantidadVendida: { $sum: '$cantidad' }
+        }
+      },
+      { $sort: { ingresos: -1 } }
     ]);
 
-    return resultado.length > 0 ? resultado[0].total : 0;
+    const totalIngresos = resultado.reduce((acc, curr) => acc + curr.ingresos, 0);
+    return { totalIngresos, detallePorProducto: resultado };
   }
 
-  /**
-   * Retorna los productos más vendidos con su cantidad total.
-   */
+
   async productosMasVendidos(limit: string | number = 5): Promise<any[]> {
-    const limitNumber = Number(limit); // 🔥 Convierte a número
-
+    const limitNumber = Number(limit);
     if (isNaN(limitNumber) || limitNumber <= 0) {
       throw new Error("El parámetro 'limit' debe ser un número válido mayor a 0.");
     }
 
-    return await this.ventaDetalleModel.aggregate([
-      { $group: { _id: '$producto', totalVendidos: { $sum: '$cantidad' } } },
+    const resultado = await this.ventaDetalleModel.aggregate([
+      {
+        $group: {
+          _id: '$producto',
+          totalVendidos: { $sum: '$cantidad' },
+          totalGenerado: { $sum: { $multiply: ['$cantidad', '$precio'] } }
+        }
+      },
       { $sort: { totalVendidos: -1 } },
-      { $limit: limitNumber }, // 🔥 Asegura que aquí llegue un número
+      { $limit: limitNumber },
       {
         $lookup: {
           from: 'productos',
@@ -78,10 +133,18 @@ export class EstadisticaService {
         }
       },
       { $unwind: '$productoInfo' },
-      { $project: { _id: 0, producto: '$productoInfo.titulo', totalVendidos: 1 } },
+      {
+        $project: {
+          _id: 0,
+          producto: '$productoInfo.titulo',
+          totalVendidos: 1,
+          totalGenerado: 1
+        }
+      }
     ]);
-  }
 
+    return resultado;
+  }
 
   /**
    * Método dinámico para filtrar por fecha.
@@ -94,9 +157,15 @@ export class EstadisticaService {
       fechaInicio.setDate(fechaInicio.getDate() - 7);
     } else if (periodo === 'mes') {
       fechaInicio.setMonth(fechaInicio.getMonth() - 1);
-    } else if (periodo === 'año') {
+    } else if (periodo === 'anio') {
       fechaInicio.setFullYear(fechaInicio.getFullYear() - 1);
     }
     return { createdAT: { $gte: fechaInicio } };
+  }
+
+
+  private getNombreMes(numeroMes: number): string {
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return meses[numeroMes - 1];
   }
 }

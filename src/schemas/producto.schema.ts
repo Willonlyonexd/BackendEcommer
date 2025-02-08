@@ -20,17 +20,16 @@ export const ProductoSchema = new Schema({
     type: String,
     require: true,
     trim: true,
-  },
-  
+  },   
   descuento: {
     type: Number,
     require: false,
-    trim: true,
+    trim: true,      
   },
   etiqueta: {
     type: String,
     default:'Nuevo',
-    require: true,
+    require: true,          
     trim: true,
   },
   clasificacion: {

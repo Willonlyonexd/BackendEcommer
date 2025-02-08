@@ -20,7 +20,6 @@ constructor(
 @UseGuards(AuthGuard)
 async createIngreso(@Res() res,@Req() req) {
     const data=req.body;
-
     const ingreso = await this.ingresoService.createIngreso(data, req.user);
     res.status(200).send(ingreso);
 }
@@ -61,6 +60,24 @@ async getIngresos(@Res() res, @Req() req, @Param('inicio') inicio,@Param('fin') 
         const ingresos = await this.ingresoService.getIngresosAlmacen(id);
         res.status(200).send(ingresos);     
       }
+
+      @Post('createEgreso')
+      @UseGuards(AuthGuard)
+      async createEgreso(@Res() res,@Req() req) {
+        console.log("entre")
+          const data=req.body;
+          const ingreso = await this.ingresoService.createEgreso(data, req.user);
+          res.status(200).send(ingreso);
+      }
+
+      @Get('BuscarProductoAlmacen/:almacen/:producto/:variedad/:cantidad')
+      @UseGuards(AuthGuard)
+      async BuscarProductoAlmacen(@Res() res, @Req() req, @Param('almacen') almacen,@Param('producto') producto,@Param('variedad') variedad,@Param('cantidad') cantidad) {
+        const ingresos = await this.ingresoService.BuscarProductoAlmacen( almacen,producto,variedad,cantidad);
+        res.status(200).send(ingresos);     
+      }
+    
+
 
 }
 

@@ -147,7 +147,7 @@ export class ProductoController {
         const filename='uploads/productos/'+img
         if(fs.existsSync(filename)){
             res.sendFile(path.resolve(filename))
-        }else{
+        }else{  
 
         }
     }
@@ -212,9 +212,10 @@ export class ProductoController {
         res.status(200).send(imagen)
     }
 
+    
     @Get('buscarProducto/:filtro')
     @UseGuards(AuthGuard)
-    async buscarProducto(@Res()res, @Req() req,@Param('filtro') filtro:any){
+    async buscarProductoAlmacen(@Res()res, @Req() req,@Param('filtro') filtro:any){
 
         const productos=await this._productoService.buscarProducto(filtro)
         res.status(200).send(productos)

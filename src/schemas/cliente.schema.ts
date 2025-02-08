@@ -12,7 +12,7 @@ export const ClienteSchema = new Schema({
     trim: true,
   },
   email: {
-    type: String,
+    type: String, 
     require: true,
     trim: true,
   },
@@ -26,14 +26,12 @@ export const ClienteSchema = new Schema({
     require: true,
     trim: true,
   },
-
   estado: {
     type: Boolean,
     default: true,
     require: true,
     trim: true,
   },
- 
   fullname: {
     type: String,
     require: true,

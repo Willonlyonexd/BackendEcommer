@@ -26,6 +26,7 @@ import { ProveedorModule } from './api/proveedor/proveedor.module';
 import { AlmacenModule } from './api/almacen/almacen.module';
 import { EstadisticaModule } from './api/estadistica/estadistica.module';
 import { ReporteModule } from './api/reporte/reporte.module';
+import { PagoModule } from './api/pago/pago.module';
 
 
 
@@ -36,10 +37,10 @@ import { ReporteModule } from './api/reporte/reporte.module';
 
   imports: [
 
-    // MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
-    // MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
-    MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/proyecto1?retryWrites=true&w=majority&appName=proyecto1'),
-    MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/log?retryWrites=true&w=majority&appName=proyecto1', { connectionName: 'logsConnection' }),
+    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
+    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
+    // MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/proyecto1?retryWrites=true&w=majority&appName=proyecto1'),
+    // MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/log?retryWrites=true&w=majority&appName=proyecto1', { connectionName: 'logsConnection' }),
     UsuarioModule,
     ProductoModule,
     LogModule,
@@ -55,7 +56,8 @@ import { ReporteModule } from './api/reporte/reporte.module';
     ProveedorModule,
     AlmacenModule,
     EstadisticaModule,
-    ReporteModule
+    ReporteModule,
+    PagoModule
   ],
   controllers: [AppController,],
   providers: [AppService,

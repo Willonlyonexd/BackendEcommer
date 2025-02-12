@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import {  Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 // import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { PdfService } from './pdf.service';
 import { MailService } from './mail.service';
@@ -46,45 +46,30 @@ export class ReporteController {
   @Post('enviar')
   // @UseGuards(AuthGuard)
   @Post('enviar')
-  async enviarReporteCorreo(
-    @Body('entidad') entidad: string,
-    @Body('inicio') inicio: string,
-    @Body('fin') fin: string,
-    @Body('emails') emails: string[],
-    @Body('subject') subject: string,
-    @Body('body') body: string
-  ) {
+  async enviarReporteCorreo(@Res()res, @Req() req) {
+    const { entidad, inicio, fin, email, asunto, mensaje } = req.body;
+    
+    console.log('req.body', req.body);
+    
+    const subject = asunto;
+    const body = mensaje;
     const datos = await this.reportesService.obtenerDatosPorRango(entidad, inicio, fin);
+    const detalles= await this.reportesService.obtenerDetallesPorRango(entidad, inicio, fin);
 
+    console.log('detalles del controlador', detalles);
+    
     if (!datos.data.length) {
       return { message: `No hay registros en ${entidad} dentro del rango de fechas.` };
     }
 
     const pdfBuffer = await this.pdfService.generarReporte(datos.data, entidad);
 
-    await this.mailService.enviarCorreoConAdjunto(emails, subject, body, pdfBuffer, `Reporte_${entidad}.pdf`);
+    const pdfBufferDetalles = await this.pdfService.generarReporteDetalles(detalles.data, entidad);
 
-    return { message: `El reporte de ${entidad} se envió correctamente a los destinatarios.` };
+    const respuesta =await this.mailService.enviarCorreoConAdjunto(email, subject, body, pdfBuffer,pdfBufferDetalles, `Reporte_${entidad}.pdf`,`ReporteDetalles_${entidad}.pdf`);
+
+    res.send(respuesta);
   }
 
-  // async enviarReporteCorreo(
-  //   @Query('entidad') entidad: string,
-  //   @Query('inicio') inicio: string,
-  //   @Query('fin') fin: string,
-  //   @Query('emails') emails: string,
-  //   @Query('subject') subject: string,
-  //   @Query('body') body: string
-  // ) {
-  //   const datos = await this.reportesService.obtenerDatosPorRango(entidad, inicio, fin);
-  //   if (!datos.data.length) {
-  //     return { message: `No hay registros en ${entidad} dentro del rango de fechas.` };
-  //   }
-
-  //   const pdfBuffer = await this.pdfService.generarReporte(datos.data, entidad);
-  //   const destinatarios = emails.split(',').map(email => email.trim());
-
-  //   await this.mailService.enviarCorreoConAdjunto(destinatarios, subject, body, pdfBuffer, `Reporte_${entidad}.pdf`);
-
-  //   return { message: `El reporte de ${entidad} se envió correctamente a los destinatarios.` };
-  // }
+  
 }

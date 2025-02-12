@@ -13,22 +13,27 @@ export class MailService {
         },
     });
 
-    async enviarCorreoConAdjunto(destinatarios: string[], subject: string, body: string, pdfBuffer: Buffer, fileName: string) {
+    async enviarCorreoConAdjunto(email:string, subject: string, body: string, pdfBuffer: Buffer,pdfBufferDetalles:Buffer, fileName: string,filenameDetalles:string) {
         try {
+            console.log('email', email);
             const info = await this.transporter.sendMail({
                 from: '"Tkm jeans" <sopote@tecnoweb.edu>',
-                to: destinatarios.join(', '),
+                to: email,
                 subject,
                 text: body,
                 attachments: [
                     {
                         filename: fileName,
                         content: pdfBuffer
+                    },
+                    {
+                        filename: filenameDetalles, 
+                        content: pdfBufferDetalles
                     }
                 ]
             });
 
-            console.log('Correo enviado:', info.messageId);
+            return { message: 'Correo enviado con éxito a ' + email, info };
         } catch (error) {
             console.error('Error al enviar correo:', error);
         }

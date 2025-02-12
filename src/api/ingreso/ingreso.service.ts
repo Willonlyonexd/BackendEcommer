@@ -117,7 +117,7 @@ export class IngresoService {
      try {
 
         console.log(data)
-        const ingreso= await this.ingresoModel.find({tipo:"egreso"}).sort({createdAT:-1});
+        const ingreso= await this.ingresoModel.find({tipo:"Egreso"}).sort({createdAT:-1});
         let codigo=0;
         if(ingreso.length==0){
             codigo=1
@@ -128,7 +128,7 @@ export class IngresoService {
         data.usuario=usuario.sub;
         data.codigo=codigo;
         data.tipo='Egreso'
-        data.estado='Procesado'
+        data.estado='Confirmado'
         const regIngreso= await this.ingresoModel.create(data);
         
         

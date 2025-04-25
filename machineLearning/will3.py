@@ -17,74 +17,77 @@ class Color:
     BLUE = '\033[94m'
 
 # Conexión a MongoDB
-# Conexión a MongoDB
+print(f"{Color.BLUE}Conectando a MongoDB Atlas...{Color.END}")
 uri = "mongodb+srv://houwenvt:will@cluster0.crz8eun.mongodb.net/EcommerML?retryWrites=true&w=majority"
 client = pymongo.MongoClient(uri)
 db = client["EcommerML"]
 
 # Período de tiempo para las ventas (10 meses)
-FECHA_FIN = datetime(2025, 4, 19, 19, 44, 44)  # Fecha actual
+FECHA_FIN = datetime(2025, 4, 20, 2, 10, 10)  # Fecha actual actualizada
 FECHA_INICIO = datetime(2024, 7, 1)  # 10 meses antes (aproximadamente)
 
-# Factores estacionales que influirán en el volumen de ventas
+# AJUSTE: Incrementar factores estacionales para generar más ventas
 FACTORES_ESTACIONALES = {
-    # (mes, día): factor_multiplicador
-    # Días normales tienen factor 1.0
-    
+    # Días normales tienen factor 1.0, pero ahora incrementamos los valores base
     # Halloween
-    (10, 30): 1.8,  # Pre-Halloween
-    (10, 31): 2.2,  # Halloween
+    (10, 29): 2.0,  # Pre-Halloween
+    (10, 30): 2.5,  # Pre-Halloween
+    (10, 31): 3.2,  # Halloween
+    
+    # Black Friday
+    (11, 28): 2.8,  # Pre-Black Friday
+    (11, 29): 4.0,  # Black Friday
     
     # Navidad
-    (12, 15): 1.5,  # Compras navideñas comienzan a aumentar
-    (12, 16): 1.5,
-    (12, 17): 1.5,
-    (12, 18): 1.5,
-    (12, 19): 1.5,
-    (12, 20): 1.8,  # Última semana antes de Navidad
-    (12, 21): 1.8,
-    (12, 22): 2.0,
-    (12, 23): 2.2,
-    (12, 24): 3.0,  # Nochebuena - pico máximo
-    (12, 25): 1.5,  # Navidad
+    (12, 15): 2.0,  # Compras navideñas comienzan a aumentar
+    (12, 16): 2.0,
+    (12, 17): 2.0,
+    (12, 18): 2.0,
+    (12, 19): 2.1,
+    (12, 20): 2.5,  # Última semana antes de Navidad
+    (12, 21): 2.5,
+    (12, 22): 3.0,
+    (12, 23): 3.2,
+    (12, 24): 4.0,  # Nochebuena - pico máximo
+    (12, 25): 2.0,  # Navidad
     
     # Fin de año
-    (12, 26): 1.8,  # Post-Navidad, compras de fin de año
-    (12, 27): 1.8,
-    (12, 28): 1.8,
-    (12, 29): 2.0,
-    (12, 30): 2.2,
-    (12, 31): 2.5,  # Nochevieja
-    (1, 1): 1.2,    # Año Nuevo
+    (12, 26): 2.5,  # Post-Navidad, compras de fin de año
+    (12, 27): 2.5,
+    (12, 28): 2.5,
+    (12, 29): 3.0,
+    (12, 30): 3.2,
+    (12, 31): 3.5,  # Nochevieja
+    (1, 1): 1.8,    # Año Nuevo
     
     # Carnaval en Bolivia (3-5 marzo 2025)
-    (2, 28): 1.5,   # Pre-Carnaval
-    (3, 1): 1.8,    # Pre-Carnaval
-    (3, 2): 2.0,    # Pre-Carnaval
-    (3, 3): 2.2,    # Carnaval
-    (3, 4): 2.2,    # Carnaval
-    (3, 5): 2.0,    # Carnaval
+    (2, 28): 2.0,   # Pre-Carnaval
+    (3, 1): 2.5,    # Pre-Carnaval
+    (3, 2): 3.0,    # Pre-Carnaval
+    (3, 3): 3.2,    # Carnaval
+    (3, 4): 3.2,    # Carnaval
+    (3, 5): 3.0,    # Carnaval
     
     # Inicio de clases en Bolivia (1 febrero)
-    (1, 20): 1.5,   # Preparación para inicio de clases
-    (1, 21): 1.5,
-    (1, 22): 1.5,
-    (1, 23): 1.8,
-    (1, 24): 1.8,
-    (1, 25): 2.0,
-    (1, 26): 2.0,
-    (1, 27): 2.0,
-    (1, 28): 2.2,
-    (1, 29): 2.2,
-    (1, 30): 2.5,
-    (1, 31): 2.8,   # Día antes del inicio de clases - muy alto
-    (2, 1): 3.0,    # Inicio de clases - pico máximo
-    (2, 2): 2.5,    # Continúan compras escolares
-    (2, 3): 2.2,
-    (2, 4): 2.0,
-    (2, 5): 1.8,
-    (2, 6): 1.5,
-    (2, 7): 1.5,
+    (1, 20): 2.0,   # Preparación para inicio de clases
+    (1, 21): 2.0,
+    (1, 22): 2.0,
+    (1, 23): 2.5,
+    (1, 24): 2.5,
+    (1, 25): 3.0,
+    (1, 26): 3.0,
+    (1, 27): 3.0,
+    (1, 28): 3.2,
+    (1, 29): 3.2,
+    (1, 30): 3.5,
+    (1, 31): 3.8,   # Día antes del inicio de clases - muy alto
+    (2, 1): 4.0,    # Inicio de clases - pico máximo
+    (2, 2): 3.5,    # Continúan compras escolares
+    (2, 3): 3.2,
+    (2, 4): 3.0,
+    (2, 5): 2.5,
+    (2, 6): 2.0,
+    (2, 7): 2.0,
 }
 
 # Productos relacionados con temporadas específicas
@@ -118,11 +121,11 @@ SEGMENTOS_EDAD = {
     "adulto": ["Classic", "Elegant", "Premium", "Ejecutivo", "Pro"]
 }
 
-# Definición de segmentos de clientes
+# AJUSTE: Aumentar porcentajes de compradores frecuentes y regulares
 SEGMENTOS_CLIENTES = {
-    "frecuente": 0.15,    # 15% son compradores frecuentes
-    "regular": 0.55,      # 55% son compradores regulares
-    "ocasional": 0.30,    # 30% son compradores ocasionales
+    "frecuente": 0.25,    # 25% son compradores frecuentes (era 15%)
+    "regular": 0.50,      # 50% son compradores regulares (era 55%)
+    "ocasional": 0.25,    # 25% son compradores ocasionales (era 30%)
 }
 
 def cargar_datos():
@@ -175,11 +178,11 @@ def obtener_probabilidad_compra(cliente_id, segmentos, fecha, semilla_personaliz
     if semilla_personalizada:
         random.seed(str(semilla_personalizada) + str(fecha.toordinal()))
     
-    # Probabilidad base por segmento
+    # AJUSTE: Incrementar probabilidades base para generar más ventas
     base_prob = {
-        "frecuente": 0.12,    # 12% chance de compra en un día normal
-        "regular": 0.04,      # 4% chance de compra en un día normal
-        "ocasional": 0.01     # 1% chance de compra en un día normal
+        "frecuente": 0.20,    # 20% chance de compra en un día normal (era 12%)
+        "regular": 0.08,      # 8% chance de compra en un día normal (era 4%)
+        "ocasional": 0.03     # 3% chance de compra en un día normal (era 1%)
     }
     
     segment = segmentos.get(str(cliente_id), "regular")
@@ -192,17 +195,17 @@ def obtener_probabilidad_compra(cliente_id, segmentos, fecha, semilla_personaliz
     
     # Aumentar probabilidad en fines de semana
     if fecha.weekday() >= 5:  # 5=Sábado, 6=Domingo
-        prob *= 1.5
+        prob *= 1.8  # Aumentado de 1.5 a 1.8
     
     # Ajuste por temporada de pago (quincena y fin de mes)
     if fecha.day in [15, 16, 30, 31, 1]:
-        prob *= 1.4
+        prob *= 1.7  # Aumentado de 1.4 a 1.7
     
     # Restaurar semilla aleatoria
     if semilla_personalizada:
         random.seed()
     
-    return min(prob, 0.95)  # Limitar a 95% máximo
+    return min(prob, 0.98)  # Limitar a 98% máximo (era 95%)
 
 def seleccionar_productos_para_compra(productos, variantes_por_producto, fecha, cliente, max_items=6):
     """Selecciona productos para una compra basándose en la fecha y el perfil del cliente"""
@@ -225,7 +228,8 @@ def seleccionar_productos_para_compra(productos, variantes_por_producto, fecha, 
         temporada_actual.append("verano")
     
     # Determinar número de productos en esta compra (probabilidad más alta de compras pequeñas)
-    num_items = random.choices([1, 2, 3, 4, 5, 6], weights=[40, 30, 15, 8, 5, 2])[0]
+    # AJUSTE: Ajustar pesos para tener más probabilidad de múltiples productos
+    num_items = random.choices([1, 2, 3, 4, 5, 6], weights=[35, 30, 20, 10, 3, 2])[0]
     num_items = min(num_items, max_items)
     
     # Filtrar productos disponibles
@@ -313,9 +317,9 @@ def seleccionar_productos_para_compra(productos, variantes_por_producto, fecha, 
     
     return seleccion_productos
 
-def generar_ventas(fecha_inicio, fecha_fin, productos, variantes, clientes, variantes_por_producto):
-    """Genera datos de ventas para el período especificado"""
-    print(f"\n{Color.BLUE}{Color.BOLD}Generando ventas del {fecha_inicio.strftime('%d/%m/%Y')} al {fecha_fin.strftime('%d/%m/%Y')}{Color.END}")
+def generar_ventas(fecha_inicio, fecha_fin, productos, variantes, clientes, variantes_por_producto, min_ventas=5000):
+    """Genera datos de ventas para el período especificado con un mínimo garantizado"""
+    print(f"\n{Color.BLUE}{Color.BOLD}Generando al menos {min_ventas} ventas del {fecha_inicio.strftime('%d/%m/%Y')} al {fecha_fin.strftime('%d/%m/%Y')}{Color.END}")
     
     ventas = []
     venta_detalles = []
@@ -335,136 +339,159 @@ def generar_ventas(fecha_inicio, fecha_fin, productos, variantes, clientes, vari
     total_dias = (fecha_fin - fecha_inicio).days + 1
     
     while fecha_actual <= fecha_fin:
-        # Mostrar progreso cada 10 días
-        if dias_procesados % 10 == 0:
+        # Mostrar progreso cada 5 días
+        if dias_procesados % 5 == 0:
             progress = (dias_procesados / total_dias) * 100
-            print(f"Procesando {fecha_actual.strftime('%d/%m/%Y')} - {progress:.1f}% completado")
+            print(f"Procesando {fecha_actual.strftime('%d/%m/%Y')} - {progress:.1f}% completado - {len(ventas)} ventas generadas")
+            
+            # Si estamos cerca del final del período y no hemos alcanzado el mínimo de ventas,
+            # incrementamos temporalmente las probabilidades
+            if progress > 75 and len(ventas) < min_ventas * 0.75:
+                print(f"{Color.YELLOW}Acelerando generación para alcanzar el mínimo de {min_ventas} ventas...{Color.END}")
         
         mes_actual = fecha_actual.strftime("%B %Y")
         if mes_actual not in ventas_por_mes:
             ventas_por_mes[mes_actual] = 0
             total_por_mes[mes_actual] = 0
         
-        # Por cada cliente, determinar si realiza una compra este día
-        clientes_compradores = []
-        for cliente in clientes:
-            # CORRECCIÓN: Verificar que el cliente ya existía en esta fecha
-            fecha_creacion = cliente.get("createdAT")
+        # Múltiples iteraciones por día para aumentar el volumen
+        iteraciones_por_dia = 1
+        
+        # Aumentar iteraciones en días especiales para generar más ventas
+        mes_dia = (fecha_actual.month, fecha_actual.day)
+        if mes_dia in FACTORES_ESTACIONALES and FACTORES_ESTACIONALES[mes_dia] >= 3.0:
+            iteraciones_por_dia = 2  # Duplicar iteraciones en días de alta demanda
+        
+        # Si estamos rezagados respecto al objetivo, aumentar iteraciones
+        if len(ventas) < (dias_procesados / total_dias) * min_ventas * 0.9:
+            iteraciones_por_dia += 1
+        
+        for _ in range(iteraciones_por_dia):
+            # Por cada cliente, determinar si realiza una compra este día
+            clientes_compradores = []
+            for cliente in clientes:
+                # Verificar que el cliente ya existía en esta fecha
+                fecha_creacion = cliente.get("createdAT")
+                
+                if fecha_creacion and fecha_actual >= fecha_creacion:
+                    # El cliente ya existe en esta fecha, puede realizar compras
+                    semilla = str(cliente["_id"])
+                    prob_compra = obtener_probabilidad_compra(
+                        str(cliente["_id"]), 
+                        segmentos_cliente, 
+                        fecha_actual, 
+                        semilla
+                    )
+                    
+                    # Decidir si este cliente compra hoy
+                    if random.random() < prob_compra:
+                        clientes_compradores.append(cliente)
+                else:
+                    # El cliente aún no existe en esta fecha
+                    clientes_sin_compra += 1
             
-            if fecha_creacion and fecha_actual >= fecha_creacion:
-                # El cliente ya existe en esta fecha, puede realizar compras
-                semilla = str(cliente["_id"])
-                prob_compra = obtener_probabilidad_compra(
-                    str(cliente["_id"]), 
-                    segmentos_cliente, 
-                    fecha_actual, 
-                    semilla
+            # Para cada cliente que compra, generar su compra
+            for cliente in clientes_compradores:
+                # Determinar hora de compra (7am a 11pm)
+                hora_compra = random.randint(7, 23)
+                minuto_compra = random.randint(0, 59)
+                segundo_compra = random.randint(0, 59)
+                
+                timestamp_compra = fecha_actual.replace(
+                    hour=hora_compra,
+                    minute=minuto_compra,
+                    second=segundo_compra
                 )
                 
-                # Decidir si este cliente compra hoy
-                if random.random() < prob_compra:
-                    clientes_compradores.append(cliente)
-            else:
-                # El cliente aún no existe en esta fecha
-                clientes_sin_compra += 1
-        
-        # Para cada cliente que compra, generar su compra
-        for cliente in clientes_compradores:
-            # Determinar hora de compra (7am a 11pm)
-            hora_compra = random.randint(7, 23)
-            minuto_compra = random.randint(0, 59)
-            segundo_compra = random.randint(0, 59)
-            
-            timestamp_compra = fecha_actual.replace(
-                hour=hora_compra,
-                minute=minuto_compra,
-                second=segundo_compra
-            )
-            
-            # Seleccionar productos para esta compra
-            productos_seleccionados = seleccionar_productos_para_compra(
-                productos, 
-                variantes_por_producto,
-                fecha_actual,
-                cliente
-            )
-            
-            if not productos_seleccionados:
-                continue  # No se encontraron productos válidos
-            
-            # Calcular total de la compra
-            total_compra = sum(
-                p["variante"].get("precio", 0) * p["cantidad"] 
-                for p in productos_seleccionados
-            )
-            
-            # Crear documento de venta
-            venta_id = ObjectId()
-            venta = {
-                "_id": venta_id,
-                "cliente": cliente["_id"],
-                "total": total_compra,
-                "envio": 0,  # Sin costo de envío según ejemplo
-                "estado": "Procesado",
-                "createdAT": timestamp_compra,
-                "__v": 0
-            }
-            ventas.append(venta)
-            ventas_por_mes[mes_actual] += 1
-            total_por_mes[mes_actual] += total_compra
-            
-            # Crear detalles de venta para cada producto
-            for datos_producto in productos_seleccionados:
-                producto = datos_producto["producto"]
-                variante = datos_producto["variante"]
-                cantidad = datos_producto["cantidad"]
+                # Seleccionar productos para esta compra
+                productos_seleccionados = seleccionar_productos_para_compra(
+                    productos, 
+                    variantes_por_producto,
+                    fecha_actual,
+                    cliente
+                )
                 
-                # Crear detalle
-                detalle = {
-                    "_id": ObjectId(),
+                if not productos_seleccionados:
+                    continue  # No se encontraron productos válidos
+                
+                # Calcular total de la compra
+                total_compra = sum(
+                    p["variante"].get("precio", 0) * p["cantidad"] 
+                    for p in productos_seleccionados
+                )
+                
+                # Crear documento de venta
+                venta_id = ObjectId()
+                venta = {
+                    "_id": venta_id,
                     "cliente": cliente["_id"],
-                    "venta": venta_id,
-                    "producto": producto["_id"],
-                    "variedad": variante["_id"],
-                    "cantidad": cantidad,
-                    "precio": variante.get("precio", 0),
-                    "createdAT": timestamp_compra + timedelta(milliseconds=random.randint(1, 100)),
+                    "total": total_compra,
+                    "envio": 0,  # Sin costo de envío según ejemplo
+                    "estado": "Procesado",
+                    "createdAT": timestamp_compra,
                     "__v": 0
                 }
-                venta_detalles.append(detalle)
+                ventas.append(venta)
+                ventas_por_mes[mes_actual] += 1
+                total_por_mes[mes_actual] += total_compra
                 
-                try:
-                    cantidad_int = int(cantidad)
+                # Crear detalles de venta para cada producto
+                for datos_producto in productos_seleccionados:
+                    producto = datos_producto["producto"]
+                    variante = datos_producto["variante"]
+                    cantidad = datos_producto["cantidad"]
                     
-                    # Buscar los ingresos correspondientes
-                    ingresos = list(db.ingresodetalles.find(
-                        {"producto_variedad": variante["_id"], "estado": True}
-                    ).sort("createdAT", -1).limit(cantidad_int))
+                    # Crear detalle
+                    detalle = {
+                        "_id": ObjectId(),
+                        "cliente": cliente["_id"],
+                        "venta": venta_id,
+                        "producto": producto["_id"],
+                        "variedad": variante["_id"],
+                        "cantidad": cantidad,
+                        "precio": variante.get("precio", 0),
+                        "createdAT": timestamp_compra + timedelta(milliseconds=random.randint(1, 100)),
+                        "__v": 0
+                    }
+                    venta_detalles.append(detalle)
                     
-                    if len(ingresos) < cantidad_int:
-                        print(f"{Color.WARNING}Advertencia: No hay suficientes registros de ingreso para {producto['titulo']} (variante {variante['_id']}).{Color.END}")
-            
-                    # Preparar operaciones de actualización en lote
-                    if ingresos:
-                        bulk_operations = []
-                        for ingreso in ingresos:
-                            bulk_operations.append(
-                                pymongo.UpdateOne(
-                                    {"_id": ingreso["_id"]},
-                                    {"$set": {
-                                        "estado": False,
-                                        "venta": venta_id,
-                                        "ventaDetalle": detalle["_id"],
-                                    }}
-                                )
-                            )
+                    try:
+                        cantidad_int = int(cantidad)
                         
-                        if bulk_operations:
-                            db.ingresodetalles.bulk_write(bulk_operations)
-                except Exception as e:
-                    # Correcto
-                    print(f"{Color.WARNING}Error procesando variante {variante['_id']}: {str(e)}{Color.END}")
+                        # Buscar los ingresos correspondientes
+                        ingresos = list(db.ingresodetalles.find(
+                            {"producto_variedad": variante["_id"], "estado": True}
+                        ).sort("createdAT", -1).limit(cantidad_int))
+                        
+                        if len(ingresos) < cantidad_int:
+                            print(f"{Color.WARNING}Advertencia: No hay suficientes registros de ingreso para {producto['titulo']} (variante {variante['_id']}).{Color.END}")
+                
+                        # Preparar operaciones de actualización en lote
+                        if ingresos:
+                            bulk_operations = []
+                            for ingreso in ingresos:
+                                bulk_operations.append(
+                                    pymongo.UpdateOne(
+                                        {"_id": ingreso["_id"]},
+                                        {"$set": {
+                                            "estado": False,
+                                            "venta": venta_id,
+                                            "ventaDetalle": detalle["_id"],
+                                        }}
+                                    )
+                                )
+                            
+                            if bulk_operations:
+                                db.ingresodetalles.bulk_write(bulk_operations)
+                    except Exception as e:
+                        # Correcto
+                        print(f"{Color.WARNING}Error procesando variante {variante['_id']}: {str(e)}{Color.END}")
         
+        # Verificar si ya alcanzamos el mínimo de ventas
+        if len(ventas) >= min_ventas and fecha_actual > fecha_inicio + timedelta(days=90):
+            print(f"{Color.GREEN}Se alcanzó la meta de {min_ventas} ventas ({len(ventas)} generadas). Finalizando proceso.{Color.END}")
+            break
+            
         # Avanzar al siguiente día
         fecha_actual += timedelta(days=1)
         dias_procesados += 1
@@ -488,14 +515,24 @@ def insertar_datos_ventas(ventas, venta_detalles):
     db.ventadetalles.delete_many({})
     print(f"{Color.GREEN}✓ Colecciones limpiadas{Color.END}")
     
-    # Insertar nuevos datos
+    # Insertar nuevos datos en bloques para evitar errores de tamaño
+    tamano_bloque = 500
+    
     if ventas:
-        db.ventas.insert_many(ventas)
-        print(f"{Color.GREEN}✓ Se insertaron {len(ventas)} ventas{Color.END}")
+        total_ventas = len(ventas)
+        for i in range(0, total_ventas, tamano_bloque):
+            bloque = ventas[i:min(i+tamano_bloque, total_ventas)]
+            db.ventas.insert_many(bloque)
+            print(f"{Color.GREEN}✓ Insertado bloque de ventas {i+1} a {min(i+tamano_bloque, total_ventas)} de {total_ventas}{Color.END}")
     
     if venta_detalles:
-        db.ventadetalles.insert_many(venta_detalles)
-        print(f"{Color.GREEN}✓ Se insertaron {len(venta_detalles)} detalles de venta{Color.END}")
+        total_detalles = len(venta_detalles)
+        for i in range(0, total_detalles, tamano_bloque):
+            bloque = venta_detalles[i:min(i+tamano_bloque, total_detalles)]
+            db.ventadetalles.insert_many(bloque)
+            print(f"{Color.GREEN}✓ Insertado bloque de detalles {i+1} a {min(i+tamano_bloque, total_detalles)} de {total_detalles}{Color.END}")
+        
+    print(f"\n{Color.GREEN}{Color.BOLD}✓ Total: Se insertaron {len(ventas)} ventas con {len(venta_detalles)} detalles{Color.END}")
 
 def analizar_datos_ventas(ventas, venta_detalles):
     """Analiza y muestra estadísticas sobre las ventas generadas"""
@@ -507,6 +544,7 @@ def analizar_datos_ventas(ventas, venta_detalles):
         "Inicio de Clases (Feb)": 0,
         "Carnaval (Mar)": 0,
         "Halloween (Oct)": 0,
+        "Black Friday (Nov)": 0,
         "Resto del año": 0
     }
     
@@ -520,6 +558,8 @@ def analizar_datos_ventas(ventas, venta_detalles):
             ventas_por_temporada["Carnaval (Mar)"] += 1
         elif fecha.month == 10 and 29 <= fecha.day <= 31:
             ventas_por_temporada["Halloween (Oct)"] += 1
+        elif fecha.month == 11 and 28 <= fecha.day <= 30:
+            ventas_por_temporada["Black Friday (Nov)"] += 1
         else:
             ventas_por_temporada["Resto del año"] += 1
     
@@ -543,12 +583,14 @@ def analizar_datos_ventas(ventas, venta_detalles):
     print(f"  • Frecuentes (5+ compras): {len(clientes_frecuentes)} clientes")
     print(f"  • Regulares (2-4 compras): {len(clientes_regulares)} clientes")
     print(f"  • Ocasionales (1 compra): {len(clientes_ocasionales)} clientes")
+    print(f"  • Total clientes activos: {len(cliente_compras)} de {db.clientes.count_documents({'estado': True})}")
     
     # Valor promedio de compra
     if ventas:
         total_ventas = sum(v["total"] for v in ventas)
         promedio = total_ventas / len(ventas)
         print(f"\nValor promedio por compra: ${promedio:.2f}")
+        print(f"Valor total de ventas: ${total_ventas:.2f}")
 
     # Analizar ventas por antigüedad del cliente
     ventas_por_antiguedad = {
@@ -608,46 +650,62 @@ def confirmar_ventas(ventas, venta_detalles):
         "Procesado": 0
     }
     
-    # Agrupar detalles de venta por venta_id para procesar juntos
-    detalles_por_venta = {}
-    for detalle in venta_detalles:
-        venta_id = detalle["venta"]
-        if venta_id not in detalles_por_venta:
-            detalles_por_venta[venta_id] = []
-        detalles_por_venta[venta_id].append(detalle)
+    # Procesar cada venta en bloques para evitar problemas de rendimiento
+    total_ventas = len(ventas)
+    tamano_bloque = 500
     
-    # Procesar cada venta
-    for venta in ventas:
-        venta_id = venta["_id"]
+    for i in range(0, total_ventas, tamano_bloque):
+        print(f"Procesando bloque de ventas {i+1} a {min(i+tamano_bloque, total_ventas)} de {total_ventas}")
+        bloque_ventas = ventas[i:min(i+tamano_bloque, total_ventas)]
         
-        # Determinar nuevo estado basado en probabilidades
-        nuevo_estado = random.choices(estados, probabilidades)[0]
+        # Procesar cada venta de este bloque
+        operaciones_ventas = []
+        operaciones_detalles = []
         
-        # Si el estado no cambia (sigue en "Procesado"), continuar al siguiente
-        if nuevo_estado == "Procesado":
-            ventas_por_estado["Procesado"] += 1
-            continue
-        
-        # Para "Confirmado", el valor booleano siempre es True
-        boo_estado = True
-        
-        try:
-            # Actualizar la venta
-            db.ventas.update_one(
-                {"_id": venta_id},
-                {"$set": {"estado": nuevo_estado}}
+        for venta in bloque_ventas:
+            venta_id = venta["_id"]
+            
+            # Determinar nuevo estado basado en probabilidades
+            nuevo_estado = random.choices(estados, probabilidades)[0]
+            
+            # Si el estado no cambia (sigue en "Procesado"), continuar al siguiente
+            if nuevo_estado == "Procesado":
+                ventas_por_estado["Procesado"] += 1
+                continue
+            
+            # Para "Confirmado", el valor booleano siempre es True
+            boo_estado = True
+            
+            # Añadir operación para actualizar la venta
+            operaciones_ventas.append(
+                pymongo.UpdateOne(
+                    {"_id": venta_id},
+                    {"$set": {"estado": nuevo_estado}}
+                )
             )
             
-            # Actualizar todos los detalles asociados
-            db.ventadetalles.update_many(
-                {"venta": venta_id},
-                {"$set": {"estado_": nuevo_estado, "estado": boo_estado}}
+            # Añadir operación para actualizar todos los detalles asociados
+            operaciones_detalles.append(
+                pymongo.UpdateMany(
+                    {"venta": venta_id},
+                    {"$set": {"estado_": nuevo_estado, "estado": boo_estado}}
+                )
             )
             
-            ventas_por_estado[nuevo_estado] += 1
-            
-        except Exception as e:
-            print(f"{Color.WARNING}Error al actualizar venta {venta_id}: {str(e)}{Color.END}")
+            ventas_por_estado["Confirmado"] += 1
+        
+        # Ejecutar operaciones en lote
+        if operaciones_ventas:
+            try:
+                db.ventas.bulk_write(operaciones_ventas)
+            except Exception as e:
+                print(f"{Color.WARNING}Error al actualizar ventas: {str(e)}{Color.END}")
+        
+        if operaciones_detalles:
+            try:
+                db.ventadetalles.bulk_write(operaciones_detalles)
+            except Exception as e:
+                print(f"{Color.WARNING}Error al actualizar detalles de venta: {str(e)}{Color.END}")
     
     # Mostrar estadísticas
     print(f"\n{Color.GREEN}✓ Proceso de confirmación completado{Color.END}")
@@ -656,13 +714,13 @@ def confirmar_ventas(ventas, venta_detalles):
     for estado, cantidad in ventas_por_estado.items():
         porcentaje = (cantidad / total_ventas) * 100
         print(f"  • {estado}: {cantidad} ventas ({porcentaje:.1f}%)")
-        
+
 def main():
     try:
         print(f"\n{Color.BOLD}{'=' * 60}{Color.END}")
-        print(f"{Color.BOLD}GENERADOR DE VENTAS REALISTAS - 10 MESES{Color.END}")
+        print(f"{Color.BOLD}GENERADOR DE VENTAS MASIVAS - TARGET: 5,000+ VENTAS{Color.END}")
         print(f"{Color.BOLD}{'=' * 60}{Color.END}")
-        print(f"Usuario: muimui69sii")
+        print(f"Usuario: muimui69")
         print(f"Fecha actual: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         # Cargar datos
@@ -671,10 +729,11 @@ def main():
             print(f"{Color.FAIL}Error: Faltan datos necesarios en la base de datos.{Color.END}")
             return
         
-        # Generar ventas
+        # Generar ventas con mínimo de 5,000
         ventas, venta_detalles = generar_ventas(
             FECHA_INICIO, FECHA_FIN, 
-            productos, variantes, clientes, variantes_por_producto
+            productos, variantes, clientes, variantes_por_producto,
+            min_ventas=5000
         )
         
         if not ventas:
@@ -682,7 +741,7 @@ def main():
             return
         
         # Preguntar si queremos insertar los datos
-        print(f"\n{Color.BOLD}Se generaron {len(n)} ventas con {len(venta_detalles)} detalles.{Color.END}")
+        print(f"\n{Color.BOLD}Se generaron {len(ventas)} ventas con {len(venta_detalles)} detalles.{Color.END}")
         respuesta = input("¿Desea insertar estos datos en la base de datos? (s/n): ")
         
         if respuesta.lower() in ['s', 'si', 'y', 'yes']:

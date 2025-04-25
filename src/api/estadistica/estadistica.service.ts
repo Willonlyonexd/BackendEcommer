@@ -11,7 +11,9 @@ export class EstadisticaService {
 
   async totalVentas(filtro?: string, agruparPorMes: boolean = false) {
     let matchStage = {};
-    if (filtro) {
+
+    // ⚠️ Solo aplicamos el filtro si no agrupamos por mes
+    if (filtro && !agruparPorMes) {
       matchStage = this.getFechaFiltro(filtro);
     }
 
@@ -20,15 +22,14 @@ export class EstadisticaService {
     ];
 
     if (agruparPorMes) {
-      pipeline.push({
-        $group: {
-          _id: { mes: { $month: '$createdAT' }, anio: { $year: '$createdAT' } },
-          total: { $sum: '$total' }
-        }
-      },
+      pipeline.push(
         {
-          $sort: { '_id.anio': 1, '_id.mes': 1 }
+          $group: {
+            _id: { mes: { $month: '$createdAT' }, anio: { $year: '$createdAT' } },
+            total: { $sum: '$total' }
+          }
         },
+        { $sort: { '_id.anio': 1, '_id.mes': 1 } },
         {
           $project: {
             _id: 0,
@@ -36,7 +37,8 @@ export class EstadisticaService {
             anio: '$_id.anio',
             total: 1
           }
-        });
+        }
+      );
     } else {
       pipeline.push({
         $group: { _id: null, total: { $sum: '$total' } }
@@ -44,17 +46,16 @@ export class EstadisticaService {
     }
 
     const resultado = await this.ventaModel.aggregate(pipeline);
-
-    if (agruparPorMes) {
-      return resultado;
-    } else {
-      return resultado.length > 0 ? resultado[0].total : 0;
-    }
+    return agruparPorMes ? resultado : (resultado.length > 0 ? resultado[0].total : 0);
   }
 
-
   async cantidadVentasRealizadas(filtro?: string): Promise<any> {
-    const matchStage = filtro ? this.getFechaFiltro(filtro) : {};
+    let matchStage = {};
+
+    // 👇 Solo filtramos si se especifica
+    if (filtro && filtro !== 'todos') {
+      matchStage = this.getFechaFiltro(filtro);
+    }
 
     const resultado = await this.ventaModel.aggregate([
       { $match: matchStage },
@@ -78,9 +79,13 @@ export class EstadisticaService {
     return { totalVentas, detallePorEstado };
   }
 
-
   async ingresosGenerados(filtro?: string): Promise<any> {
-    const matchStage = filtro ? this.getFechaFiltro(filtro) : {};
+    let matchStage = {};
+
+    // 👇 Solo filtramos si no pedimos "todos"
+    if (filtro && filtro !== 'todos') {
+      matchStage = this.getFechaFiltro(filtro);
+    }
 
     const resultado = await this.ventaDetalleModel.aggregate([
       { $match: matchStage },
@@ -106,7 +111,6 @@ export class EstadisticaService {
     const totalIngresos = resultado.reduce((acc, curr) => acc + curr.ingresos, 0);
     return { totalIngresos, detallePorProducto: resultado };
   }
-
 
   async productosMasVendidos(limit: string | number = 5): Promise<any[]> {
     const limitNumber = Number(limit);
@@ -146,9 +150,6 @@ export class EstadisticaService {
     return resultado;
   }
 
-  /**
-   * Método dinámico para filtrar por fecha.
-   */
   private getFechaFiltro(periodo: string): object {
     const fechaInicio = new Date();
     if (periodo === 'dia') {
@@ -162,7 +163,6 @@ export class EstadisticaService {
     }
     return { createdAT: { $gte: fechaInicio } };
   }
-
 
   private getNombreMes(numeroMes: number): string {
     const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];

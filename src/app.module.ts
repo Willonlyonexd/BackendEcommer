@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsuarioModule } from './api/usuario/usuario.module';
-import { SegmentationModule } from './api/segmentation/segmentation.module';
+import { SegmentationModule } from './api/ml-segmentation/segmentation.module';
 
 import { ProductoModule } from './api/producto/producto.module';
 

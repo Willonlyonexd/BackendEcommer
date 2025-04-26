@@ -15,7 +15,7 @@ import { InventarioModule } from './api/inventario/inventario.module';
 import { TenantModule } from './api/tenant/tenant.module';
 import { TclienteModule } from './api/tcliente/tcliente.module';
 
-
+import { RegresionModule } from './api/ml-regresion/regresion.module';
 import { EmailsModule } from './api/emails/emails.module';
 
 import { VisitanteModule } from './api/visitante/visitante.module';
@@ -38,10 +38,10 @@ import { PagoModule } from './api/pago/pago.module';
 
   imports: [
 
-    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
-    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
+    MongooseModule.forRoot('mongodb+srv://mauricioaleman3524:mauri@cluster0.crz8eun.mongodb.net/EcommerML'),
+    MongooseModule.forRoot('mongodb+srv://mauricioaleman3524:mauri@cluster0.crz8eun.mongodb.net/EcommerML', { connectionName: 'logsConnection' }),
     // MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/proyecto1?retryWrites=true&w=majority&appName=proyecto1'),
-    //MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/log?retryWrites=true&w=majority&appName=proyecto1', { connectionName: 'logsConnection' }),
+    // MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/log?retryWrites=true&w=majority&appName=proyecto1', { connectionName: 'logsConnection' }),
     UsuarioModule,
     ProductoModule,
     LogModule,
@@ -59,7 +59,8 @@ import { PagoModule } from './api/pago/pago.module';
     EstadisticaModule,
     ReporteModule,
     PagoModule,
-    SegmentationModule
+    SegmentationModule,
+    RegresionModule,
   ],
   controllers: [AppController,],
   providers: [AppService,

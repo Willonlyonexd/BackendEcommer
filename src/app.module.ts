@@ -28,6 +28,7 @@ import { AlmacenModule } from './api/almacen/almacen.module';
 import { EstadisticaModule } from './api/estadistica/estadistica.module';
 import { ReporteModule } from './api/reporte/reporte.module';
 import { PagoModule } from './api/pago/pago.module';
+import { LinealModule } from './api/ml-lineal/lineal.module';
 
 
 
@@ -62,6 +63,7 @@ import { PagoModule } from './api/pago/pago.module';
     PagoModule,
     SegmentationModule,
     RegresionModule,
+    LinealModule
   ],
   controllers: [AppController,],
   providers: [AppService,

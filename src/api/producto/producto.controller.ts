@@ -40,6 +40,14 @@ export class ProductoController {
         res.status(200).send(categorias)
     }
 
+    @Get('getCategoriasAll')
+    @UseGuards(AuthGuard)
+    async getCategoriasAll(@Res() res){
+        const categorias= await this._productoService.getCategoriasAll()
+        res.status(200).send(categorias)
+    }
+
+
     @Put('cambioEstadoCategoria/:id')
     @UseGuards(AuthGuard)
     async cambioEstado(@Res()res, @Req() req,@Param('id') id:any){
@@ -147,8 +155,10 @@ export class ProductoController {
         const filename='uploads/productos/'+img
         if(fs.existsSync(filename)){
             res.sendFile(path.resolve(filename))
+            console.log('existe')
         }else{  
-
+            res.status(200).send({message:'no existe la imagen'})
+            console.log('no existe')
         }
     }
 

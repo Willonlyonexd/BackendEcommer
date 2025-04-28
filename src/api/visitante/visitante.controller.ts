@@ -8,21 +8,22 @@ export class VisitanteController {
         private readonly vistanteService: VisitanteService
     ) {}
 
-    // ✅ getProductosTienda con paginación y filtros
+    
     @Get('getProductosTienda')
     async getProductosTienda(
         @Req() req,
         @Res() res,
-        @Query('page') page: number = 1,
-        @Query('limit') limit: number = 10,
+        @Query('page') page: number,
+        @Query('limit') limit: number,
         @Query('genero') genero?: string,
-        @Query('categorias') categorias?: string, // coma separada: 123,456
-        @Query('precio') precio?: string          // ej: 50-100
+        @Query('categorias') categorias?: string, 
+        @Query('precio') precio?: string          
     ) {
         try {
+            console.log(page, limit, genero, categorias, precio);
             const productos = await this.vistanteService.getProductosTienda(
-                Number(page),
-                Number(limit),
+                page,
+                limit,
                 genero,
                 categorias,
                 precio

@@ -263,12 +263,17 @@ export class ProductoService {
         }
     } 
 
-
-    async AddImagenProducto(data,file){
+    async AddImagenProducto(data: any, file: any) {
         try {
-            data.imagen=file.filename
-            const imagen= await this.productoGaleriaModel.create(data)
-            return {data:imagen}
+            data.imagen = file.filename;
+            const imagen = await this.productoGaleriaModel.create(data);
+            const galeria = await this.productoGaleriaModel.find({ producto: data.producto });
+            
+            if (galeria.length === 1) {
+                await this.productoModel.findByIdAndUpdate(data.producto, { portada: file.filename });
+            }
+    
+            return { data: imagen };
         } catch (error) {
             return { data: undefined, message: 'No se pudo agregar la imagen' };
         }
@@ -302,6 +307,19 @@ export class ProductoService {
             if(imagen){
                 await fs.remove(path.resolve('./uploads/productos/'+imagen.imagen))
                 await this.productoGaleriaModel.findByIdAndDelete({_id:id})
+
+                const producto = await this.productoModel.findOne({ _id: imagen.producto });
+                if (producto.portada === imagen.imagen) {
+                    const siguienteImagen = await this.productoGaleriaModel.findOne({ producto: producto._id });
+                    if (siguienteImagen) {
+                        
+                        await this.productoModel.findByIdAndUpdate(producto._id, { portada: siguienteImagen.imagen });
+                    } else {
+                        
+                        await this.productoModel.findByIdAndUpdate(producto._id, { portada: '' });
+                    }
+                }
+
                 return {data:true}
             }else{
                 return { data: undefined, message: 'No se pudo obtener la imagen' };

@@ -13,42 +13,40 @@ export class VisitanteService {
     ) {}
 
     async getProductosTienda(
-        page: number = 1,
-        limit: number = 10,
+        page: number,
+        limit: number, 
         genero?: string,
         categorias?: string,
         precio?: string
     ) {
         try {
-            const skip = (page - 1) * limit;
-
-            // 🧠 Filtro base
             const filtro: any = { estado: true };
+
+            console.log(page,limit)
 
             if (genero && genero !== 'Todos') {
                 filtro.clasificacion = genero;
             }
-
+    
             if (categorias) {
                 const categoriasArray = categorias.split(',');
                 filtro.categoria = { $in: categoriasArray };
             }
-
+    
+            const totalProducts = await this.productoModel.countDocuments(filtro);
             const productos = await this.productoModel
                 .find(filtro)
                 .populate('categoria')
-                .sort({ createdAT: -1 });
-
+                .sort({ createdAT: -1 })
+                .skip((page-1) * limit)
+                .limit(limit);
             const arr_productos = [];
-
             for (const element of productos) {
                 const variaciones = await this.productoVariedadModel.find({
                     producto: element._id,
                     precio: { $gt: 0 }
                 });
-
                 let cantidadesTotal = 0;
-
                 for (const subItem of variaciones) {
                     const unidades = await this.ingresoDetalleModel.find({
                         producto_variedad: subItem._id,
@@ -57,16 +55,15 @@ export class VisitanteService {
                     });
                     cantidadesTotal += unidades.length;
                 }
-
+    
                 if (cantidadesTotal > 0 && variaciones.length > 0) {
                     const precioBase = variaciones[0].precio;
-
-                    // ✅ Filtrar por precio si aplica
+    
                     if (precio) {
                         const [min, max] = precio.split('-').map(Number);
                         if (precioBase < min || precioBase > max) continue;
                     }
-
+    
                     arr_productos.push({
                         _id: element._id,
                         titulo: element.titulo,
@@ -79,12 +76,12 @@ export class VisitanteService {
                     });
                 }
             }
-
-            const total = arr_productos.length;
-            const paginated = arr_productos.slice(skip, skip + limit);
-
-            return { data: paginated, total };
+    
+          
+    
+            return { data: arr_productos, total: totalProducts };
         } catch (error) {
+            console.log(error);
             return {
                 data: undefined,
                 message: 'Error al obtener los productos de la tienda'

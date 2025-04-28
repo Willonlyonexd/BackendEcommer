@@ -147,8 +147,10 @@ export class ProductoController {
         const filename='uploads/productos/'+img
         if(fs.existsSync(filename)){
             res.sendFile(path.resolve(filename))
+            console.log('existe')
         }else{  
-
+            res.status(200).send({message:'no existe la imagen'})
+            console.log('no existe')
         }
     }
 

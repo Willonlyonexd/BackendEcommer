@@ -36,9 +36,33 @@ import { PagoModule } from './api/pago/pago.module';
 @Module({
 
   imports: [
-
-    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
-    MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
+    MongooseModule.forRootAsync({
+      useFactory: () => {
+        return {
+          uri: "mongodb+srv://moisodev:moiso@cluster0.crz8eun.mongodb.net/EcommerML",
+          retryAttempts: 5,
+          retryDelay: 3000,
+          connectionFactory: (connection) => {
+            console.log('✅ MongoDB conectado'); // Verifica en los logs
+            connection.on('error', (err) => console.error('🔥 MongoDB error:', err));
+            return connection;
+          },
+        }
+      }
+    }),
+    MongooseModule.forRootAsync({
+      connectionName: 'logsConnection',
+      useFactory: () => {
+        return {
+          uri: "mongodb+srv://moisodev:moiso@cluster0.crz8eun.mongodb.net/EcommerML",
+          retryAttempts: 5,
+          retryDelay: 3000,
+        }
+      }
+    }),
+    // MongooseModule.forRoot('mongodb+srv://moisodev:moiso@cluster0.crz8eun.mongodb.net/EcommerML', { connectionName: 'logsConnection' }),
+    // MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb'),
+    // MongooseModule.forRoot('mongodb://localhost:27017/tecnoWeb', { connectionName: 'logsConnection' }),
     // MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/proyecto1?retryWrites=true&w=majority&appName=proyecto1'),
     //MongooseModule.forRoot('mongodb+srv://juniorzamo:juniorzamo1999@tecnoweb.8qtyd.mongodb.net/log?retryWrites=true&w=majority&appName=proyecto1', { connectionName: 'logsConnection' }),
     UsuarioModule,

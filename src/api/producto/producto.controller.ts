@@ -40,6 +40,14 @@ export class ProductoController {
         res.status(200).send(categorias)
     }
 
+    @Get('getCategoriasAll')
+    @UseGuards(AuthGuard)
+    async getCategoriasAll(@Res() res){
+        const categorias= await this._productoService.getCategoriasAll()
+        res.status(200).send(categorias)
+    }
+
+
     @Put('cambioEstadoCategoria/:id')
     @UseGuards(AuthGuard)
     async cambioEstado(@Res()res, @Req() req,@Param('id') id:any){

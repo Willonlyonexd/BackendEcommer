@@ -51,6 +51,17 @@ export class ProductoService {
         }
     }
 
+
+    async getCategoriasAll(){
+        try {
+            const categorias= await this.categoriaModel.find()
+            return {data:categorias}
+        }
+        catch (error) {
+            return{data:undefined, message:'no se pudo obtener la categoria'}
+        }
+    }
+
     async cambioEstadoCategoria(id: any, data: any) {
         const usuario = await this.categoriaModel.findOne({ _id: id, genero:data.genero });
         if (usuario) {

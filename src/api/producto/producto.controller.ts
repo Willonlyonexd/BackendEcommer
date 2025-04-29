@@ -71,6 +71,7 @@ export class ProductoController {
         const categoria=await this._productoService.updateCategoria(id,data,)
         res.status(200).send(categoria)
     }
+    
 
 
 
@@ -140,6 +141,13 @@ export class ProductoController {
         }
     }
 
+    //Obtener productos por array de ids
+    @Post('getProductosByArrayId')
+    async getProductosByArrayId(@Res()res, @Req() req){
+        const data=req.body
+        const productos=await this._productoService.getProductosByArrayId(data)
+        res.status(200).send(productos)
+    }
 
     //obtener productos
     @Get('getProductos/:filtro')

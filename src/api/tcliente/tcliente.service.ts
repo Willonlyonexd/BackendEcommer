@@ -51,7 +51,7 @@ export class TclienteService {
                 if (cliente.email_validacion) {
                     const compare = await bcrypt.compare(data.password, cliente.password)
 
-                    if (compare) {
+                    if (!compare) {
                         const jwt = this._jwtService.sign({
                             sub: cliente._id,
                             email: cliente.email,

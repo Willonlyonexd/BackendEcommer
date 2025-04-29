@@ -150,6 +150,41 @@ export class ProductoService {
         }
     }
 
+    async getProductosByArrayId(data: any) {
+        try {
+          console.log(data);
+          const arregloProducto = [];
+          
+         
+          let idsArray: any[];
+          
+          if (data.productos && Array.isArray(data.productos)) {
+         
+            idsArray = data.productos.map(item => item.id);
+          } else if (Array.isArray(data)) {
+            
+            idsArray = data.map(item => typeof item === 'string' ? item : item.id);
+          } else {
+            throw new Error('Formato de datos no válido');
+          }
+          
+          for (const id of idsArray) {
+            const producto = await this.productoModel.findOne({ _id: id })
+              .populate('categoria')
+              .sort({createdAT: -1});
+            
+            if (producto) {
+              
+              arregloProducto.push({producto});
+            }
+          }
+          
+          return {data: arregloProducto};
+        } catch (error) {
+          return {data: undefined, message: 'No se pudo obtener los productos'};
+        }
+      }
+
     async getProductos(filtro){
         try {
             const arregloProducto=[];

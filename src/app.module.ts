@@ -21,6 +21,7 @@ import { EmailsModule } from './api/emails/emails.module';
 import { VisitanteModule } from './api/visitante/visitante.module';
 
 import { VentaModule } from './api/venta/venta.module';
+import { RecomendacionModule } from './api/ml-recomendacion/recomendacion.module';
 
 import { ProveedorModule } from './api/proveedor/proveedor.module';
 
@@ -63,7 +64,8 @@ import { LinealModule } from './api/ml-lineal/lineal.module';
     PagoModule,
     SegmentationModule,
     RegresionModule,
-    LinealModule
+    LinealModule,
+    RecomendacionModule
   ],
   controllers: [AppController,],
   providers: [AppService,

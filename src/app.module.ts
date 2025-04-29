@@ -29,8 +29,7 @@ import { EstadisticaModule } from './api/estadistica/estadistica.module';
 import { ReporteModule } from './api/reporte/reporte.module';
 import { PagoModule } from './api/pago/pago.module';
 import { LinealModule } from './api/ml-lineal/lineal.module';
-
-
+import { ArbolModule } from './api/ml-arboles/arbol.module';
 
 
 
@@ -38,7 +37,6 @@ import { LinealModule } from './api/ml-lineal/lineal.module';
 @Module({
 
   imports: [
-
 
     MongooseModule.forRoot('mongodb+srv://will:will@cluster0.rmkpe.mongodb.net/EcommerML'),
     MongooseModule.forRoot('mongodb+srv://will:will@cluster0.rmkpe.mongodb.net/EcommerML', { connectionName: 'logsConnection' }),
@@ -63,7 +61,8 @@ import { LinealModule } from './api/ml-lineal/lineal.module';
     PagoModule,
     SegmentationModule,
     RegresionModule,
-    LinealModule
+    LinealModule,
+    ArbolModule
   ],
   controllers: [AppController,],
   providers: [AppService,

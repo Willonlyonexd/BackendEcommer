@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { SegmentationService } from './segmentation.service';
-import { SegmentationController } from './segmentation.controller';
+import { SegmentacionController } from './segmentation.controller';
+import { SegmentacionService } from './segmentation.service';
+
 
 @Module({
   imports: [HttpModule],
-  providers: [SegmentationService],
-  controllers: [SegmentationController],
+  controllers: [SegmentacionController],
+  providers: [SegmentacionService],
 })
-export class SegmentationModule {}
+export class SegmentacionModule {}

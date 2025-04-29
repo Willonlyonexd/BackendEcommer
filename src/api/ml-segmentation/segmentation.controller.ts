@@ -1,31 +1,24 @@
-import { Controller, Get, Post, Param } from '@nestjs/common';
-import { SegmentationService } from './segmentation.service';
+import { Controller, Get } from '@nestjs/common';
+import { SegmentacionService } from './segmentation.service';
 
-@Controller('segmentation')
-export class SegmentationController {
-  constructor(private readonly segmentationService: SegmentationService) {}
+@Controller('segmentacion')
+export class SegmentacionController {
+  constructor(private readonly segmentacionService: SegmentacionService) {}
 
-  @Get('status')
-  async getStatus() {
-    return await this.segmentationService.getSegmentationStatus();
+  @Get('segmentacion-resumen')
+  async getSegmentacionResumen() {
+    return this.segmentacionService.obtenerResumenSegmentacion();
   }
 
-  @Post('run')
-  async run() {
-    return await this.segmentationService.runSegmentation();
+  @Get('clientes-normalizados')
+  async getClientesNormalizados() {
+    return this.segmentacionService.obtenerClientesNormalizados();
   }
 
-  @Get('customer/:id')
-  async getCustomer(@Param('id') id: string) {
-    return await this.segmentationService.getCustomerSegment(id);
+  @Get('consolidado')
+  async obtenerConsolidadoClientes() {
+    return await this.segmentacionService.obtenerConsolidadoClientes();
   }
 
-  @Get('check-new-data')
-  async checkNewData() {
-    return await this.segmentationService.checkNewData();
-  }
-  @Get('clientes')
-  async getClientesSegmentados() {
-    return this.segmentationService.getClientesSegmentados();
-  }
+  
 }

@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsuarioModule } from './api/usuario/usuario.module';
-import { SegmentationModule } from './api/ml-segmentation/segmentation.module';
 
 import { ProductoModule } from './api/producto/producto.module';
 
@@ -31,6 +30,7 @@ import { ReporteModule } from './api/reporte/reporte.module';
 import { PagoModule } from './api/pago/pago.module';
 import { LinealModule } from './api/ml-lineal/lineal.module';
 import { ArbolModule } from './api/ml-arboles/arbol.module';
+import { SegmentacionModule } from './api/ml-segmentation/segmentation.module';
 
 
 
@@ -60,7 +60,7 @@ import { ArbolModule } from './api/ml-arboles/arbol.module';
     EstadisticaModule,
     ReporteModule,
     PagoModule,
-    SegmentationModule,
+    SegmentacionModule,
     RegresionModule,
     LinealModule,
     RecomendacionModule,

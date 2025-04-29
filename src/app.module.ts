@@ -21,6 +21,7 @@ import { EmailsModule } from './api/emails/emails.module';
 import { VisitanteModule } from './api/visitante/visitante.module';
 
 import { VentaModule } from './api/venta/venta.module';
+import { RecomendacionModule } from './api/ml-recomendacion/recomendacion.module';
 
 import { ProveedorModule } from './api/proveedor/proveedor.module';
 
@@ -62,6 +63,7 @@ import { ArbolModule } from './api/ml-arboles/arbol.module';
     SegmentationModule,
     RegresionModule,
     LinealModule,
+    RecomendacionModule,
     ArbolModule
   ],
   controllers: [AppController,],

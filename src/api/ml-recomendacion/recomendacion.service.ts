@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios'; // 👈 Importa AxiosResponse para tipar 
 
 @Injectable()
 export class RecomendacionService {
-  private readonly API_RECOMENDACION_BASE = 'https://backenpyrecomendacion.onrender.com/api/productos';
+  private readonly API_RECOMENDACION_BASE = 'https://endpointrecomendacion-qjj5u.ondigitalocean.app/api/productos'; 
 
   constructor(private readonly httpService: HttpService) {}
 

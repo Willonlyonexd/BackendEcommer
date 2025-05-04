@@ -15,7 +15,7 @@ export class RegresionService {
   ) {
     // URL de tu API FastAPI desplegada en Render
     this.apiUrl = this.configService.get<string>('REGRESION_API_URL') || 
-      'https://modeloregresionfastapi.onrender.com';
+      'https://plankton-app-z3kke.ondigitalocean.app';
   }
 
   /**

@@ -11,7 +11,7 @@ export class LinealService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.apiUrl = this.configService.get<string>('PREDICTION_API_URL') || 'https://modelolinealfastapi.onrender.com/api';
+    this.apiUrl = this.configService.get<string>('PREDICTION_API_URL') || 'https://lionfish-app-6fmwa.ondigitalocean.app/api';
   }
 
   async predecirVentasCategoria(categoriaId: string, meses: number = 3, incluirGrafico: boolean = true): Promise<any> {
